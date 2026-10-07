@@ -31,3 +31,10 @@ The problem: compute the number of working days between two dates, accounting fo
 - All date comparisons use the **UTC date component** and discard the time of day. `2024-01-06T23:59Z` and `2024-01-06T00:00Z` are the same business day. If your inputs carry local-time semantics, normalise them yourself first.
 - `shiftBusinessDays` does **not** normalise the start date. Shifting a Saturday by 0 returns that Saturday; shifting by 1 returns the next Monday (skipping the weekend). If you need the start date itself normalised to a business day, do that explicitly before calling.
 - `businessDaysBetween` with `start > end` returns 0 rather than throwing.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
